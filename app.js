@@ -3,10 +3,15 @@ const LineByLineReader = require('line-by-line');
 const parse = require('csv-parse');
 const file = require('./components/file');
 
-const currentFile = 'lifesight1';
-// const currentFile = 'example-single';
-file.openFile(__dirname + '/log/', currentFile);
-const lr = new LineByLineReader(__dirname + '/data/' + currentFile + '.tsv');
+const config = {
+  logFolder: __dirname + '/logs/',
+  dataFolder: __dirname + '/data/',
+  fileName: 'lifesight6',
+  timestamp: Date.now(),
+};
+
+file.openFile(config.logFolder, config.fileName, config.timestamp);
+const lr = new LineByLineReader(config.dataFolder + config.fileName + '.tsv');
 
 lr.on('error', function (err) {
   console.error(err);
@@ -28,15 +33,17 @@ lr.on('line', function (line) {
     const req = https.request(options, (res) => {
       res.on('data', (d) => {
         console.log(`${res.statusCode},${d},${res.req.path}`);
-        file.addLine(
-          __dirname + '/log/',
-          currentFile,
-          res.statusCode,
-          d,
-          res.req.path
-        );
+        if (res.statusCode !== 200) {
+          file.addLine(
+            config.logFolder,
+            config.fileName,
+            config.timestamp,
+            res.statusCode,
+            d,
+            res.req.path
+          );
+        }
       });
-      // lr.resume();
     });
     req.on('error', (e) => {
       console.error(e);

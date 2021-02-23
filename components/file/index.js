@@ -9,22 +9,36 @@ async function readFile(filePath) {
   }
 }
 
-async function openFile(filepath, filename) {
+async function openFile(filepath, filename, timestamp) {
   try {
     const csvHeaders = 'statuscode,response,path';
     // TODO: add human readable timestamp to log filename
-    await fs.writeFile(filepath + filename + '.log', csvHeaders);
+    await fs.writeFile(
+      filepath + filename + '_' + timestamp + '.log',
+      csvHeaders
+    );
   } catch (error) {
     console.error(`Got an error trying to write to a file: ${error.message}`);
   }
 }
 
-async function addLine(filepath, filename, statuscode, response, path) {
+async function addLine(
+  filepath,
+  filename,
+  timestamp,
+  statuscode,
+  response,
+  path
+) {
   try {
     const csvLine = `\n${statuscode},${response},${path}`;
-    await fs.writeFile(filepath + filename + '.log', csvLine, {
-      flag: 'a',
-    });
+    await fs.writeFile(
+      filepath + filename + '_' + timestamp + '.log',
+      csvLine,
+      {
+        flag: 'a',
+      }
+    );
   } catch (error) {
     console.error(`Got an error trying to write to a file: ${error.message}`);
   }
