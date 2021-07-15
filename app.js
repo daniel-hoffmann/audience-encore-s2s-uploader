@@ -9,9 +9,20 @@ const config = {
   dataFolder: __dirname + '/data/',
   // TODO: filename should be read by script in order to automate
   // filename without extension
-  fileName: '<filename>',
+  fileName: 'example',
   timestamp: Date.now(),
 };
+
+const fs = require('fs');
+const fileArray = [];
+fs.readdir(config.dataFolder, (err, files) => {
+  files.forEach((file) => {
+    if (file.endsWith('tsv') | file.endsWith('csv')) {
+      fileArray.push(file);
+    }
+  });
+  console.log(fileArray);
+});
 
 file.openFile(config.logFolder, config.fileName, config.timestamp);
 // TODO: currently tsv is hardcoded, this should work with csv, too.
@@ -23,15 +34,16 @@ lr.on('error', function (err) {
 
 lr.on('line', function (line) {
   lr.pause();
-  parse(line, { delimiter: ['\t'] }, function (err, output) {
+  parse(line, { delimiter: ['\t', ','] }, function (err, output) {
     lr.resume();
     const userInfo = output[0];
+    console.log(userInfo);
     const options = {
       host: 'aud.pubmatic.com',
       path:
         // TODO: segid can be multiple
         // TODO: IP needs to be added - country/IP logic, i.e. one has to be there, both can
-        `/AdServer/Artemis?dpid=${userInfo[0]}&userid=${userInfo[1]}&segid=${userInfo[2]}&country=${userInfo[4]}&uidtype=${userInfo[5]}`,
+        `/AdServer/Artemis?dpid=${userInfo[0]}&userid=${userInfo[1]}&segid=${userInfo[2]}&ip=${userInfo[3]}&country=${userInfo[4]}&uidtype=${userInfo[5]}`,
       method: 'GET',
     };
     const req = https.request(options, (res) => {

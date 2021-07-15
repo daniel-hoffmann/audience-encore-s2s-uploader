@@ -9,6 +9,25 @@ async function readFile(filePath) {
   }
 }
 
+async function readDirectory(folderName) {
+  try {
+    const fileArray = [];
+    await fs.readdir(folderName, (err, files) => {
+      files.forEach((file) => {
+        if (file.endsWith('tsv') | file.endsWith('csv')) {
+          fileArray.push(file);
+        }
+      });
+      console.log(fileArray);
+    });
+    return fileArray;
+  } catch (error) {
+    console.error(
+      `Got an error trying to read the directory: ${error.message}`
+    );
+  }
+}
+
 async function openFile(filepath, filename, timestamp) {
   try {
     const csvHeaders = 'statuscode,response,path';
@@ -31,14 +50,10 @@ async function addLine(
   path
 ) {
   try {
-    const csvLine = `\n${statuscode},${response},${path}`;
-    await fs.writeFile(
-      filepath + filename + '_' + timestamp + '.log',
-      csvLine,
-      {
-        flag: 'a',
-      }
-    );
+    const line = `\n${statuscode},${response},${path}`;
+    await fs.writeFile(filepath + filename + '_' + timestamp + '.log', line, {
+      flag: 'a',
+    });
   } catch (error) {
     console.error(`Got an error trying to write to a file: ${error.message}`);
   }
@@ -47,3 +62,4 @@ async function addLine(
 exports.readFile = readFile;
 exports.openFile = openFile;
 exports.addLine = addLine;
+exports.readDirectory = readDirectory;
